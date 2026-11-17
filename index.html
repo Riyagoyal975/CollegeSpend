@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollegeSpend – Smart College Daily Expense Tracker | Discrete Mathematics Project</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Chart.js CDN with graceful fallback -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🎓</div>
+                <div class="logo-text">
+                    <h1>CollegeSpend</h1>
+                    <span>Discrete Math Project</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main Menu</div>
+                <button class="nav-item active" data-target="dashboard-view">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-target="transactions-view">
+                    <span class="nav-icon">💳</span>
+                    <span>Transactions</span>
+                </button>
+                <button class="nav-item" data-target="budget-view">
+                    <span class="nav-icon">🎯</span>
+                    <span>Budget Planner</span>
+                </button>
+                <button class="nav-item" data-target="analytics-view">
+                    <span class="nav-icon">📈</span>
+                    <span>Reports & Analytics</span>
+                </button>
+
+                <div class="nav-section-title">Academic & Viva Lab</div>
+                <button class="nav-item math-highlight" data-target="math-lab-view">
+                    <span class="nav-icon">📐</span>
+                    <span>Discrete Math Lab</span>
+                </button>
+                <a href="appendix.html" target="_blank" class="nav-item" style="color: var(--brand-accent); text-decoration: none;" title="Open A4 Visual Appendix Magazine">
+                    <span class="nav-icon">📑</span>
+                    <span>Visual Appendix (A4)</span>
+                </a>
+
+                <div class="nav-section-title">System</div>
+                <button class="nav-item" data-target="settings-view">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Profile & Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="academic-badge" id="sidebarProfileCard" style="cursor: pointer; transition: all 0.2s ease;" title="Click to view/edit Academic Profile">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <span class="badge-title" id="sidebarProjectTitle">Discrete Math Project</span>
+                        <span style="font-size: 0.72rem; color: var(--brand-primary); font-weight: 600;" title="Edit Profile">✏️ Edit</span>
+                    </div>
+                    <div style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem; line-height: 1.25;" id="sidebarStudentName">Student Profile</div>
+                    <div class="badge-sub" style="color: var(--brand-primary); font-weight: 600; margin-top: 2px;" id="sidebarRollNumber"></div>
+                    <div class="badge-sub" id="sidebarAcademicInfo">B.Tech CSE • 3rd Semester</div>
+                    <div class="badge-sub" style="color: var(--text-muted); font-size: 0.72rem; margin-top: 2px;" id="sidebarUniversity">Manav Rachna University</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Top App Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Toggle menu">☰</button>
+                    <div class="page-title">
+                        <h2 id="headerPageTitle">Dashboard Overview</h2>
+                        <p id="headerPageSubtitle">Track daily spending habits, budget limits & mathematical models</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <a href="appendix.html" target="_blank" class="btn btn-secondary btn-sm" title="Open A4 Portfolio Appendix" style="display: inline-flex; align-items: center; gap: 5px; text-decoration: none;">
+                        <span>📑</span>
+                        <span>A4 Appendix</span>
+                    </a>
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">🌙</button>
+                    <button class="btn-primary-action" id="headerAddExpenseBtn">
+                        <span>➕</span>
+                        <span>Add Expense</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Views Body -->
+            <main class="content-body">
+                
+                <!-- ==========================================
+                     VIEW 1: DASHBOARD
+                     ========================================== -->
+                <section class="view-section active" id="dashboard-view">
+                    <!-- 4 Key Metric Summary Cards -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Total Spent</h3>
+                                <div class="metric-value" id="dashTotalSpent">₹0.00</div>
+                                <div class="metric-sub" id="dashTotalCount">0 total transactions</div>
+                            </div>
+                            <div class="metric-icon-box icon-blue">💰</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Today's Expenses</h3>
+                                <div class="metric-value" id="dashTodaySpent">₹0.00</div>
+                                <div class="metric-sub" id="dashTodayCount">0 expenses today</div>
+                            </div>
+                            <div class="metric-icon-box icon-purple">📅</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>This Month</h3>
+                                <div class="metric-value" id="dashMonthSpent">₹0.00</div>
+                                <div class="metric-sub" id="dashMonthDays">Current Month</div>
+                            </div>
+                            <div class="metric-icon-box icon-amber">📆</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Remaining Budget</h3>
+                                <div class="metric-value" id="dashRemainingBudget">₹0.00</div>
+                                <div class="metric-sub" id="dashBudgetStatusBadge">Budget Status</div>
+                            </div>
+                            <div class="metric-icon-box icon-green" id="dashBudgetIconBox">🎯</div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Health Progress Bar -->
+                    <div class="budget-status-card">
+                        <div class="budget-status-header">
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 700;">Monthly Budget Consumption</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-secondary);" id="budgetAlertText">Loading budget status...</p>
+                            </div>
+                            <span class="badge" id="budgetPercentageBadge">0% Used</span>
+                        </div>
+                        <div class="budget-bar-track">
+                            <div class="budget-bar-fill safe" id="dashboardBudgetBar" style="width: 0%;"></div>
+                        </div>
+                        <div class="budget-stats-row">
+                            <span id="dashMonthlyBudgetLimit">Target: ₹8,000</span>
+                            <span id="dashDailySafeAllowance">Recommended Daily: ₹250/day</span>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">📈 Daily Spending Timeline</h3>
+                                <span class="badge badge-info">Interactive</span>
+                            </div>
+                            <div style="position: relative; height: 280px;">
+                                <canvas id="analyticsTrendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">🍩 Category Breakdown</h3>
+                                <span class="badge badge-info" id="dashHighestCatBadge">Highest: --</span>
+                            </div>
+                            <div style="position: relative; height: 280px;">
+                                <canvas id="analyticsCategoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions Panel -->
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">🕒 Recent Transactions</h3>
+                            <div class="panel-actions">
+                                <button class="btn btn-secondary btn-sm" id="dashViewAllTransactionsBtn">View All</button>
+                                <button class="btn btn-primary btn-sm" id="dashQuickAddBtn">+ Add</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table" id="dashboardRecentTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Title & Details</th>
+                                        <th>Category</th>
+                                        <th>Payment</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardRecentTbody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 2: TRANSACTIONS & EXPENSE MANAGEMENT
+                     ========================================== -->
+                <section class="view-section" id="transactions-view">
+                    <!-- Filter and Search Toolbar -->
+                    <div class="filter-toolbar">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="form-control" id="transSearchInput" placeholder="Search by title, description or category...">
+                        </div>
+
+                        <select class="form-control" id="transCategoryFilter" style="max-width: 180px;">
+                            <option value="all">All Categories</option>
+                            <option value="Food">Food & Canteen</option>
+                            <option value="Travel">Travel & Metro</option>
+                            <option value="Stationery">Stationery & Books</option>
+                            <option value="Shopping">Shopping & Clothes</option>
+                            <option value="College Fees">College & Exam Fees</option>
+                            <option value="Entertainment">Entertainment & Outings</option>
+                            <option value="Others">Others & Misc</option>
+                        </select>
+
+                        <select class="form-control" id="transPaymentFilter" style="max-width: 170px;">
+                            <option value="all">All Payment Modes</option>
+                            <option value="UPI / GPay / PhonePe">UPI / GPay</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Debit / Credit Card">Card</option>
+                            <option value="Net Banking">Net Banking</option>
+                        </select>
+
+                        <select class="form-control" id="transSortSelect" style="max-width: 160px;">
+                            <option value="date_desc">Newest First</option>
+                            <option value="date_asc">Oldest First</option>
+                            <option value="amount_desc">Amount: High to Low</option>
+                            <option value="amount_asc">Amount: Low to High</option>
+                            <option value="title_asc">Title A-Z</option>
+                        </select>
+
+                        <button class="btn btn-secondary" id="transResetFiltersBtn" title="Reset all filters">Reset</button>
+                    </div>
+
+                    <!-- Date Range and Secondary Filters -->
+                    <div class="card-panel" style="padding: 14px 20px; margin-bottom: 20px;">
+                        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);">Date Filter:</span>
+                                <input type="date" class="form-control" id="transStartDate" style="max-width: 150px; padding: 6px 10px;">
+                                <span style="font-size: 0.82rem; color: var(--text-muted);">to</span>
+                                <input type="date" class="form-control" id="transEndDate" style="max-width: 150px; padding: 6px 10px;">
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button class="btn btn-secondary btn-sm" id="transExportCsvBtn">📥 Export CSV</button>
+                                <button class="btn btn-primary btn-sm" id="transAddNewExpenseBtn">+ New Expense</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full Transactions Table -->
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">📋 Transaction Ledger</h3>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);" id="transCountFilteredLabel">Showing all transactions</p>
+                            </div>
+                            <div id="transFilteredSumBadge" class="badge badge-info" style="font-size: 0.85rem; padding: 6px 14px;">
+                                Total: ₹0.00
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="custom-table" id="fullTransactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Expense Item & Description</th>
+                                        <th>Category</th>
+                                        <th>Payment Mode</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fullTransactionsTbody">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 3: BUDGET MANAGEMENT
+                     ========================================== -->
+                <section class="view-section" id="budget-view">
+                    <div class="two-col-grid" style="margin-bottom: 24px;">
+                        <!-- Monthly Budget Config Card -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">🎯 Set Monthly Budget</h3>
+                            </div>
+                            <form id="budgetSettingForm">
+                                <div class="form-group">
+                                    <label for="budgetInputAmount">Monthly Spending Limit (INR ₹)</label>
+                                    <input type="number" step="100" min="500" max="1000000" class="form-control" id="budgetInputAmount" placeholder="e.g. 8000" required>
+                                    <small style="color: var(--text-muted); font-size: 0.76rem; display: block; margin-top: 4px;">
+                                        Allocated pocket money / monthly student allowance.
+                                    </small>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Monthly Budget</button>
+                            </form>
+                        </div>
+
+                        <!-- Daily Recommended Allowance Card -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">⚡ Safe Daily Allowance</h3>
+                            </div>
+                            <div style="text-align: center; padding: 12px 0;">
+                                <div style="font-size: 2.2rem; font-weight: 800; color: var(--brand-primary);" id="budgetDailyAllowanceValue">₹0</div>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
+                                    Safe spending per day for the remaining <strong id="budgetDaysRemainingText">0 days</strong> in this month.
+                                </p>
+                                <div style="margin-top: 14px; padding: 10px; background: var(--bg-tertiary); border-radius: var(--radius-md); font-size: 0.8rem; color: var(--text-secondary);">
+                                    Formula: <code>Daily Allowance = (Remaining Budget) / (Days Left in Month)</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Allocation Breakdown in Current Month -->
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">📊 Category-Wise Spending in Current Month</h3>
+                            <span class="badge badge-info" id="budgetMonthTitle">Current Month</span>
+                        </div>
+                        <div id="budgetCategoryListContainer" style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Dynamically generated category progress bars -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 4: REPORTS & ANALYTICS
+                     ========================================== -->
+                <section class="view-section" id="analytics-view">
+                    <!-- Timeframe Selector -->
+                    <div class="filter-toolbar" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 0.84rem; font-weight: 600;">Analytics Period:</span>
+                            <div style="display: flex; gap: 6px;" id="analyticsTimeframeButtons">
+                                <button class="btn btn-secondary btn-sm active" data-timeframe="all">All Time</button>
+                                <button class="btn btn-secondary btn-sm" data-timeframe="this_month">This Month</button>
+                                <button class="btn btn-secondary btn-sm" data-timeframe="this_week">This Week</button>
+                                <button class="btn btn-secondary btn-sm" data-timeframe="today">Today</button>
+                            </div>
+                        </div>
+
+                        <div id="analyticsSummaryBadge" class="badge badge-success">0 Expenses Analyzed</div>
+                    </div>
+
+                    <!-- Key Stats -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Total Filtered</h3>
+                                <div class="metric-value" id="analyticsTotalSpent">₹0.00</div>
+                                <div class="metric-sub">Sum for selected period</div>
+                            </div>
+                            <div class="metric-icon-box icon-blue">💰</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Average / Expense</h3>
+                                <div class="metric-value" id="analyticsAvgSpent">₹0.00</div>
+                                <div class="metric-sub">Mean spending per transaction</div>
+                            </div>
+                            <div class="metric-icon-box icon-purple">➗</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Highest Category</h3>
+                                <div class="metric-value" id="analyticsHighestCategory">--</div>
+                                <div class="metric-sub" id="analyticsHighestCatAmount">₹0.00</div>
+                            </div>
+                            <div class="metric-icon-box icon-amber">🏆</div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-info">
+                                <h3>Volume</h3>
+                                <div class="metric-value" id="analyticsTxnCount">0</div>
+                                <div class="metric-sub">Recorded entries</div>
+                            </div>
+                            <div class="metric-icon-box icon-green">📝</div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Charts -->
+                    <div class="two-col-grid" style="margin-bottom: 24px;">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">💳 Payment Modes Distribution</h3>
+                            </div>
+                            <div style="position: relative; height: 260px;">
+                                <canvas id="analyticsPaymentChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">📋 Category Distribution Table</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Total Spent</th>
+                                            <th>Share %</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="analyticsCategoryTbody">
+                                        <!-- Dynamically populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 5: DISCRETE MATHEMATICS LAB (CORE VIVA REQUIREMENT)
+                     ========================================== -->
+                <section class="view-section" id="math-lab-view">
+                    <!-- Math Lab Hero Banner -->
+                    <div class="math-lab-banner">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+                            <div>
+                                <h2>Discrete Mathematics Laboratory & Viva Demonstration</h2>
+                                <p>
+                                    Every calculation, set operation, relation property, truth table, and graph theorem is genuinely implemented in pure JavaScript using live student expense data.
+                                </p>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" id="mathSyncLiveDataBtn" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.4);">
+                                🔄 Refresh with Live Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Math Sub-Navigation Pills -->
+                    <div class="math-tabs-nav">
+                        <button class="math-tab-btn active" data-math-sub="set-theory">1. Set Theory</button>
+                        <button class="math-tab-btn" data-math-sub="relations">2. Relations & Equivalence</button>
+                        <button class="math-tab-btn" data-math-sub="functions">3. Functions & Mapping</button>
+                        <button class="math-tab-btn" data-math-sub="logic">4. Propositional Logic</button>
+                        <button class="math-tab-btn" data-math-sub="graph-theory">5. Graph Theory</button>
+                    </div>
+
+                    <!-- SUB-VIEW 1: SET THEORY -->
+                    <div class="math-sub-view active" id="math-sub-set-theory">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h3 class="panel-title">📚 Set Theory & Operations</h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                        Universal Set $\mathcal{U} = \{ \text{Food, Travel, Stationery, Shopping, College Fees, Entertainment, Others} \}$
+                                    </p>
+                                </div>
+                                <select class="form-control" id="setPresetSelect" style="max-width: 280px;">
+                                    <option value="weekdaysVsWeekends">Preset: Weekday vs Weekend</option>
+                                    <option value="hostelVsDayScholar">Preset: Hostel vs Day Scholar</option>
+                                    <option value="essentialVsDiscretionary">Preset: Essential vs Discretionary</option>
+                                    <option value="liveVsAll">Live User Categories vs Universal</option>
+                                </select>
+                            </div>
+
+                            <!-- Set Elements Display -->
+                            <div class="two-col-grid" style="margin-bottom: 20px;">
+                                <div style="background: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                    <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--brand-primary);" id="setALabel">Set A</h4>
+                                    <div class="set-chips-container" id="setAChips"></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+                                        Cardinality: <strong id="setACardinality">|A| = 0</strong>
+                                    </div>
+                                </div>
+
+                                <div style="background: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                    <h4 style="font-size: 0.9rem; font-weight: 700; color: #ec4899;" id="setBLabel">Set B</h4>
+                                    <div class="set-chips-container" id="setBChips"></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+                                        Cardinality: <strong id="setBCardinality">|B| = 0</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Venn Diagram Container -->
+                            <div class="venn-container">
+                                <div class="venn-circle venn-circle-left">
+                                    <strong style="color: #2563eb;" id="vennOnlyALabel">Only A (A \ B)</strong>
+                                    <div id="vennOnlyAContent" style="font-size: 0.78rem; margin-top: 6px; color: var(--text-primary);"></div>
+                                </div>
+
+                                <div class="venn-overlap-badge">
+                                    <div style="color: #8b5cf6; font-size: 0.72rem; text-transform: uppercase;">A ∩ B (Both)</div>
+                                    <div id="vennIntersectionContent" style="margin-top: 4px; font-size: 0.78rem;"></div>
+                                </div>
+
+                                <div class="venn-circle venn-circle-right">
+                                    <strong style="color: #ec4899;" id="vennOnlyBLabel">Only B (B \ A)</strong>
+                                    <div id="vennOnlyBContent" style="font-size: 0.78rem; margin-top: 6px; color: var(--text-primary);"></div>
+                                </div>
+                            </div>
+
+                            <!-- Operations Results Grid -->
+                            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">Computed Set Operations</h4>
+                            <div id="setOperationsGrid">
+                                <!-- Dynamically generated operations cards -->
+                            </div>
+
+                            <!-- Principle of Inclusion-Exclusion Box -->
+                            <div class="formula-box" id="setPieFormulaBox" style="margin-top: 16px;">
+                                Principle of Inclusion-Exclusion: |A ∪ B| = |A| + |B| − |A ∩ B|
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-VIEW 2: RELATIONS -->
+                    <div class="math-sub-view" id="math-sub-relations">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h3 class="panel-title">🔗 Relations & Equivalence Verification</h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                        Binary Relations $R \subseteq A \times B$, Ordered Pairs $(a, b)$, and Equivalence Relations
+                                    </p>
+                                </div>
+                                <select class="form-control" id="relationModelSelect" style="max-width: 320px;">
+                                    <option value="categoryCooccurrence">Model 1: Category Same-Day Co-occurrence</option>
+                                    <option value="expenseCategory">Model 2: Expense-Category Assignment R_assign</option>
+                                    <option value="spendingTier">Model 3: Spending Tier Equivalence Relation</option>
+                                </select>
+                            </div>
+
+                            <!-- Relation Details Output -->
+                            <div id="relationDetailsContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-VIEW 3: FUNCTIONS -->
+                    <div class="math-sub-view" id="math-sub-functions">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h3 class="panel-title">📐 Functions & Input-Output Mapping</h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                        Single-valued, Left-total mappings $f: X \to Y$. Injectivity, Surjectivity, Bijectivity, and Function Composition.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div id="functionsAnalysisContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <!-- Function Composition Live Calculator -->
+                            <div class="card-panel" style="margin-top: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                                <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">
+                                    Composite Function Evaluator: $(h \circ g \circ f)(x)$
+                                </h4>
+                                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">
+                                    Let $f(x)$ be the raw transaction expense, $g(x) = 5\%\text{ GST / platform surcharge}$, and $h(x) = \text{Remaining Budget} - (f(x) + g(x))$.
+                                </p>
+                                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+                                    <label style="font-size: 0.84rem; font-weight: 600;">Sample Expense $x$ (₹):</label>
+                                    <input type="number" id="funcCompositionInput" class="form-control" value="200" style="max-width: 140px;">
+                                    <button class="btn btn-primary btn-sm" id="funcEvalCompositionBtn">Compute Composition</button>
+                                </div>
+                                <div id="funcCompositionResultBox" class="formula-box" style="margin-top: 14px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-VIEW 4: PROPOSITIONAL LOGIC -->
+                    <div class="math-sub-view" id="math-sub-logic">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h3 class="panel-title">🧠 Propositional Logic & Truth Tables</h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                        Atomic Propositions evaluated live from financial state, Logical Connectives ($\neg, \land, \lor, \to, \leftrightarrow, \oplus$), and Tautology verification.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Live Propositions State -->
+                            <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 12px;">Live Evaluated Propositions</h4>
+                            <div class="two-col-grid" id="logicLivePropositionsGrid" style="margin-bottom: 24px;">
+                                <!-- Live propositions cards -->
+                            </div>
+
+                            <!-- Compound Expressions Table -->
+                            <h4 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 12px;">Compound Financial Propositions</h4>
+                            <div class="table-responsive" style="margin-bottom: 24px;">
+                                <table class="custom-table" id="logicCompoundTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Formula</th>
+                                            <th>Proposition Meaning</th>
+                                            <th>Truth Value</th>
+                                            <th>Logical Interpretation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logicCompoundTbody">
+                                        <!-- Dynamically populated -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Interactive Truth Table Generator -->
+                            <div class="panel-header" style="margin-top: 20px;">
+                                <div>
+                                    <h4 style="font-size: 0.95rem; font-weight: 700;">Truth Table Generator</h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Standard $2^n$ Row Binary Truth Table</p>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <select class="form-control" id="truthTableVarsSelect" style="max-width: 160px;">
+                                        <option value="2">2 Variables (P, Q)</option>
+                                        <option value="3">3 Variables (P, Q, R)</option>
+                                    </select>
+                                    <select class="form-control" id="logicTautologySelect" style="max-width: 240px;">
+                                        <option value="tautology">Verify Tautology: P ∨ ¬P</option>
+                                        <option value="contradiction">Verify Contradiction: P ∧ ¬P</option>
+                                        <option value="demorgan">Verify De Morgan's Law</option>
+                                        <option value="implication_equivalence">Verify (P → Q) ↔ (¬P ∨ Q)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="truth-table" id="interactiveTruthTable">
+                                    <!-- Rendered dynamically -->
+                                </table>
+                            </div>
+
+                            <div id="logicClassificationAlert" style="margin-top: 14px;" class="formula-box"></div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-VIEW 5: GRAPH THEORY -->
+                    <div class="math-sub-view" id="math-sub-graph-theory">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h3 class="panel-title">🕸️ Graph Theory: Category Co-Spending Graph $G = (V, E)$</h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                        Vertices $V$ represent 7 Expense Categories. An edge $(u, v)$ connects categories spent on the same calendar day. Edge weights indicate co-occurrence frequency.
+                                    </p>
+                                </div>
+                                <button class="btn btn-secondary btn-sm" id="redrawGraphBtn">🔄 Re-render Canvas</button>
+                            </div>
+
+                            <!-- Canvas Visualizer -->
+                            <div class="graph-canvas-wrapper" style="margin-bottom: 20px;">
+                                <canvas id="categoryGraphCanvas"></canvas>
+                            </div>
+
+                            <!-- Handshaking Lemma Verification Banner -->
+                            <div class="handshaking-box">
+                                <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--brand-primary); margin-bottom: 4px;">
+                                    🤝 Handshaking Lemma Verification Theorem
+                                </h4>
+                                <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 8px;">
+                                    In any undirected graph, the sum of all vertex degrees is exactly twice the number of edges:
+                                    $$\sum_{v \in V} \deg(v) = 2 \cdot |E|$$
+                                </p>
+                                <div id="handshakingProofText" style="font-family: monospace; font-size: 0.95rem; font-weight: 700;">
+                                    Calculating...
+                                </div>
+                            </div>
+
+                            <!-- Vertex Degrees & Adjacency Matrix Grid -->
+                            <div class="two-col-grid" style="margin-top: 20px;">
+                                <div>
+                                    <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 10px;">Vertex Degrees $\deg(v)$</h4>
+                                    <div class="table-responsive">
+                                        <table class="custom-table" id="vertexDegreesTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Vertex (Category)</th>
+                                                    <th>Type</th>
+                                                    <th>Degree $\deg(v)$</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="vertexDegreesTbody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 10px;">Adjacency Matrix $A_{7 \times 7}$</h4>
+                                    <div class="table-responsive">
+                                        <table class="matrix-table" id="graphAdjMatrixTable" style="margin: 0; width: 100%;">
+                                            <!-- Dynamically generated -->
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 6: SETTINGS & ACADEMIC DATA
+                     ========================================== -->
+                <section class="view-section" id="settings-view">
+                    <div class="two-col-grid" style="margin-bottom: 24px;">
+                        <!-- Student Profile Card -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">🎓 Student Profile & Academic Details</h3>
+                                <span class="badge badge-info">Editable</span>
+                            </div>
+                            <form id="settingsProfileForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="settingsStudentName">Student Name *</label>
+                                        <input type="text" class="form-control" id="settingsStudentName" placeholder="Enter your full name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="settingsRollNumber">Roll Number *</label>
+                                        <input type="text" class="form-control" id="settingsRollNumber" placeholder="e.g. 24CS3042" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="settingsCourse">Course *</label>
+                                        <input type="text" class="form-control" id="settingsCourse" placeholder="e.g. B.Tech Computer Science and Engineering" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="settingsSemester">Semester *</label>
+                                        <input type="text" class="form-control" id="settingsSemester" placeholder="e.g. 3rd Semester" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="settingsUniversityName">University Name *</label>
+                                    <input type="text" class="form-control" id="settingsUniversityName" placeholder="e.g. Manav Rachna University" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="settingsProjectTitle">Project Title *</label>
+                                    <input type="text" class="form-control" id="settingsProjectTitle" placeholder="e.g. CollegeSpend – Smart College Daily Expense Tracker" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="settingsGroupMembers">Group Members (Optional)</label>
+                                    <textarea class="form-control" id="settingsGroupMembers" rows="2" placeholder="List group member names and roll numbers, if applicable..."></textarea>
+                                </div>
+
+                                <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+                                    <button type="submit" class="btn btn-primary" id="btnSaveProfile">💾 Save Profile Details</button>
+                                    <button type="button" class="btn btn-secondary" id="btnResetProfileDefaults" title="Restore default university & project details">Restore Defaults</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Data Management Card -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">💾 Demo Data & System Storage</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md);">
+                                    <h4 style="font-size: 0.88rem; font-weight: 700;">Reset to Rich Sample Data</h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 4px 0 10px;">
+                                        Populates 15 realistic B.Tech college transactions across all categories to showcase all charts and discrete math algorithms.
+                                    </p>
+                                    <button class="btn btn-secondary btn-sm" id="btnResetDemoData">🔄 Reset to Demo Data</button>
+                                </div>
+
+                                <div style="background: var(--bg-tertiary); padding: 14px; border-radius: var(--radius-md);">
+                                    <h4 style="font-size: 0.88rem; font-weight: 700;">JSON Backup & Restore</h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 4px 0 10px;">
+                                        Download all your expense records or import from an existing JSON file.
+                                    </p>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-secondary btn-sm" id="btnExportJSON">📥 Download JSON</button>
+                                        <label class="btn btn-secondary btn-sm" style="margin: 0; cursor: pointer;">
+                                            📤 Import JSON
+                                            <input type="file" id="importJSONInput" accept=".json" style="display: none;">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div style="background: var(--danger-bg); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: var(--radius-md);">
+                                    <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--danger);">Danger Zone</h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin: 4px 0 10px;">
+                                        Permanently delete all stored expense records from LocalStorage.
+                                    </p>
+                                    <button class="btn btn-outline-danger btn-sm" id="btnClearAllExpenses">🗑️ Clear All Expenses</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Viva Quick Reference Card -->
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">📖 Project Information & Viva Examiner Notes</h3>
+                        </div>
+                        <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+                            <p><strong>Project Title:</strong> CollegeSpend – Smart College Daily Expense Tracker</p>
+                            <p><strong>Course:</strong> B.Tech 3rd Semester Computer Science & Engineering</p>
+                            <p><strong>Subject:</strong> Discrete Mathematics (MA301 / CS302)</p>
+                            <p style="margin-top: 10px;">
+                                <strong>How to Demonstrate in Viva:</strong>
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                                <li><strong>Set Theory:</strong> Open Discrete Math Lab → Set Theory tab. Show Union, Intersection, Difference, and the Principle of Inclusion-Exclusion formula verified in real time.</li>
+                                <li><strong>Relations:</strong> Switch to Relations tab. Demonstrate the 7×7 binary matrix, check Reflexive, Symmetric, and Transitive tests for equivalence.</li>
+                                <li><strong>Functions:</strong> Show the mapping of expenses to categories. Demonstrate why $f$ is Not Injective using the Pigeonhole Principle.</li>
+                                <li><strong>Propositional Logic:</strong> View live financial truth evaluations ($P, Q, R, S$). Generate the 2-variable and 3-variable truth table and classify formulas as Tautologies.</li>
+                                <li><strong>Graph Theory:</strong> View the HTML5 Canvas co-spending graph. Point out vertex degrees and show the Handshaking Lemma $\sum \deg(v) = 2|E|$ verified dynamically.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODALS
+         ========================================== -->
+
+    <!-- Add / Edit Expense Modal -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="expenseModalTitle">Add New Expense</h3>
+                <button class="modal-close-btn" id="expenseModalCloseBtn">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="modal-body">
+                    <input type="hidden" id="expenseFormId">
+
+                    <div class="form-group">
+                        <label for="expInputTitle">Expense Title / Item Name *</label>
+                        <input type="text" class="form-control" id="expInputTitle" placeholder="e.g. Canteen Lunch, Metro Recharge, Rosen Discrete Math Book" required maxlength="100">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expInputAmount">Amount (INR ₹) *</label>
+                            <input type="number" step="0.5" min="1" max="1000000" class="form-control" id="expInputAmount" placeholder="e.g. 140" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expInputDate">Date *</label>
+                            <input type="date" class="form-control" id="expInputDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expInputCategory">Category *</label>
+                            <select class="form-control" id="expInputCategory" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <option value="Food">Food & Canteen 🍔</option>
+                                <option value="Travel">Travel & Metro 🚌</option>
+                                <option value="Stationery">Stationery & Books 📚</option>
+                                <option value="Shopping">Shopping & Clothes 🛍️</option>
+                                <option value="College Fees">College & Exam Fees 🎓</option>
+                                <option value="Entertainment">Entertainment & Outings 🎬</option>
+                                <option value="Others">Others & Misc 📦</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expInputPayment">Payment Method *</label>
+                            <select class="form-control" id="expInputPayment" required>
+                                <option value="UPI / GPay / PhonePe">UPI / GPay / PhonePe</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Debit / Credit Card">Debit / Credit Card</option>
+                                <option value="Net Banking">Net Banking</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expInputDescription">Description / Notes (Optional)</label>
+                        <textarea class="form-control" id="expInputDescription" placeholder="Add additional details, splitting notes, receipt references..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="expenseModalCancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="expenseModalSaveBtn">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="modal-close-btn" id="deleteModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.92rem; color: var(--text-secondary);" id="deleteConfirmMessage">
+                    Are you sure you want to delete this expense record? This action cannot be undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="deleteModalCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="deleteModalConfirmBtn">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Application Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/expense.js"></script>
+    <script src="js/budget.js"></script>
+    <script src="js/analytics.js"></script>
+    
+    <!-- Discrete Math Modules -->
+    <script src="js/discrete-math/set-theory.js"></script>
+    <script src="js/discrete-math/relations.js"></script>
+    <script src="js/discrete-math/functions.js"></script>
+    <script src="js/discrete-math/logic.js"></script>
+    <script src="js/discrete-math/graph-theory.js"></script>
+
+    <!-- Main Coordinator & UI Application -->
+    <script src="js/app.js"></script>
+</body>
+</html>
+
